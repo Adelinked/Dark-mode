@@ -1,5 +1,14 @@
 import "../styles/globals.css";
+import { AppWrapper } from "../context";
 
-export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+function MyApp({ Component, pageProps }) {
+  const theme = pageProps.value;
+  const value = theme !== null && theme !== undefined ? theme : "dark-theme";
+  return (
+    <AppWrapper value={pageProps.value}>
+      <Component {...pageProps} />
+    </AppWrapper>
+  );
 }
+
+export default MyApp;

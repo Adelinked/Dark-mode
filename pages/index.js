@@ -1,195 +1,213 @@
 import Head from "next/head";
-import { useState } from "react";
-import axios from "axios";
-import Question from "../components/Question";
-import Results from "../components/Results";
-import Progress from "../components/Progress";
-import Form from "../components/Form";
-import Footer from "../components/Footer";
-const defaultValues = {
-  num_questions: "5",
-  difficulty: "easy",
-  category: "sports",
-};
-const randomize = (arr) => {
-  const len = arr.length;
+import "font-awesome/css/font-awesome.min.css";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../context";
+import { useLocalStorageValue } from "@mantine/hooks";
 
-  let newArr = [];
-  let index = 0;
-  let newIndex;
-  while (index < len) {
-    newIndex = Math.floor(Math.random() * len);
-    if (!newArr[newIndex]) {
-      newArr[newIndex] = arr[index];
-      index++;
-    }
-  }
-  return newArr;
-};
-
-const catNumber = {
-  sports: 21,
-  history: 23,
-  politics: 24,
-};
 const Index = () => {
-  const [formValues, setFormValues] = useState(defaultValues);
-  const [error, setError] = useState(false);
-  const [showForm, setShowForm] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [questions, setQuestions] = useState([]);
-  const [current, setCurrent] = useState(0);
-  const [showAnswerStatus, setShowAnswerStatus] = useState(false);
+  const [themeLocal, setThemeLocal] = useLocalStorageValue({
+    key: "theme",
+  });
+  const { globalState, setGlobalState } = useAppContext();
 
-  const restart = () => {
-    setQuestions([]);
-    setCurrent(0);
-    setShowForm(true);
+  useEffect(() => {
+    setGlobalState((themeLocal && themeLocal.theme) ?? "dark-theme");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+    setThemeLocal({ theme: theme });
+  }, [globalState]);
+
+  const switchTheme = () => {
+    setGlobalState((oldTheme) =>
+      oldTheme === "dark-theme" ? "light-theme" : "dark-theme"
+    );
   };
-
-  const getQuestions = async () => {
-    const { num_questions, category, difficulty } = formValues;
-    let url = `https://opentdb.com/api.php?amount=${num_questions}`;
-    if (category) url = `${url}&category=${catNumber[category]}`;
-    if (difficulty) url = `${url}&difficulty=${difficulty}`;
-    url = `${url}&type=multiple`;
-    setLoading(true);
-    try {
-      const data = await axios.get(url);
-
-      if (data.data.results.length === 0) {
-        setError(true);
-        setTimeout(() => {
-          setError(false);
-        }, 700);
-      } else {
-        setQuestions(
-          data.data.results.map((q) => ({
-            ...q,
-            correct: null,
-            all_answers: randomize(
-              [q.correct_answer, ...q.incorrect_answers] ?? []
-            ),
-          }))
-        );
-        setShowForm(false);
-      }
-    } catch (error) {
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 700);
-    }
-    setLoading(false);
-  };
-
-  const handleAnswer = (a) => {
-    setShowAnswerStatus(true);
-    const newQuestions = [...questions];
-    newQuestions[current].made = a;
-    if (a === questions[current].correct_answer) {
-      newQuestions[current].correct = true;
-    } else {
-      newQuestions[current].correct = false;
-    }
-    setQuestions(newQuestions);
-    const id = String(a) + String(current);
-    questions[current].correct
-      ? document.getElementById(id).classList.add("answer-correct")
-      : document.getElementById(id).classList.add("answer-wrong");
-    setTimeout(() => {
-      setCurrent((curr) => (curr === questions.length ? curr : curr + 1));
-      setShowAnswerStatus(false);
-    }, 800);
-  };
+  let theme = globalState;
+  const titleTheme = theme === "dark-theme" ? "light-theme" : "dark-theme";
   return (
     <>
       <Head>
-        <title>Quiz app</title>
+        <title>React Portfolio Sample</title>
         <meta name="description" content="Quiz app by next js" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="title-div">
-        <h1>Quiz app</h1>
-        <a
-          href="https://opentdb.com/api_config.php"
-          target="_blank"
-          rel="noreferrer"
-          title="Powered by Open Trivia"
-        >
-          <img
-            style={{ width: "80px", objectFit: "cover" }}
-            src="OTdb.png"
-            alt="Open Trivia db logo"
-          />
-        </a>
-      </div>
-      {!showForm && (
-        <div className="cat-div">
-          <p>Category: {formValues.category}</p>
-          <p>Difficulty: {formValues.difficulty}</p>
-        </div>
-      )}
-      <p style={{ textAlign: "center", height: "20px", color: "red" }}>
-        {error && "Something went wrong try again "}
-      </p>
-      {loading && <div className="loading">...Loading</div>}
-      {!showForm && (
-        <div className="global-div">
-          {!loading && (
-            <>
-              {current < questions.length && (
-                <Progress questions={questions} current={current} />
-              )}
-              {current < questions.length && (
-                <button
-                  onClick={() => {
-                    restart();
-                  }}
-                >
-                  Restart
-                  <span style={{ marginLeft: "5px", fontSize: "2.2rem" }}>
-                    &#10226;
-                  </span>
-                </button>
-              )}
-              <div className="answer-status">
-                {showAnswerStatus && (
-                  <>
-                    {questions[current] && questions[current].correct ? (
-                      <p style={{ color: "var(--main-green)" }}>
-                        Correct answer!
-                      </p>
-                    ) : (
-                      <p style={{ color: "var(--main-red)" }}>Wrong answer!</p>
-                    )}
-                  </>
-                )}
-              </div>
-              {current < questions.length && (
-                <Question
-                  {...questions[current]}
-                  handleAnswer={handleAnswer}
-                  current={current}
-                />
-              )}
 
-              {current == questions.length && questions.length > 1 && (
-                <Results questions={questions} restart={restart} />
+      <nav id="navbar" className="horiz-nav">
+        <a href="#welcome-section">About</a>
+        <a href="#projects">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <section id="welcome-section">
+        <header>
+          <h1 id="name">
+            Adelinked{" "}
+            <span
+              id="theme-switch"
+              title={`switch to ${titleTheme}`}
+              onClick={switchTheme}
+            >
+              {theme === "light-theme" ? (
+                <i className="fa fa-moon-o"></i>
+              ) : (
+                <i className="fa fa-sun-o"></i>
               )}
-            </>
-          )}
+            </span>
+          </h1>
+
+          <p> a web developer </p>
+        </header>
+
+        <div id="about" className="welcome-divs">
+          <h2>About me</h2>
+          <p>
+            Some textSome textSome textSome textSome textSome textSome textSome
+            text Some textSome textSome textSome textSome textSome textSome
+            textSome text Some textSome textSome textSome textSome textSome
+            textSome textSome text Some textSome textSome textSome textSome
+            textSome textSome textSome text Some textSome textSome textSome
+            textSome textSome textSome textSome text Some textSome textSome
+            textSome textSome textSome textSome textSome text Some textSome
+            textSome textSome textSome textSome textSome textSome text Some
+            textSome textSome textSome textSome textSome textSome textSome text.
+          </p>
         </div>
-      )}
-      {showForm && (
-        <Form
-          formValues={formValues}
-          setFormValues={setFormValues}
-          setShowForm={setShowForm}
-          getQuestions={getQuestions}
-        />
-      )}
-      <Footer />{" "}
+        <div id="Skills" className="welcome-divs">
+          <h2>Skills</h2>
+          <p>
+            Some textSome textSome textSome textSome textSome textSome textSome
+            text Some textSome textSome textSome textSome textSome textSome
+            textSome text Some textSome textSome textSome textSome textSome
+            textSome textSome text.
+          </p>
+        </div>
+      </section>
+      <section id="projects">
+        <h2>These are some of my projects</h2>
+        <div id="projects-div">
+          <div className="project-tile">
+            <a href="https://codepen.io/adelinked/pen/NWaOQMB" target="_blank">
+              <img
+                src="https://codepen.io/adelinked/pen/NWaOQMB/image/large.png"
+                alt="Screenshot image of Tribute page project"
+                loading="lazy"
+              />
+              <h2>Tribute page</h2>
+            </a>
+          </div>
+          <div className="project-tile">
+            <a href="https://codepen.io/adelinked/pen/BamWbPy" target="_blank">
+              <img
+                src="https://codepen.io/adelinked/pen/BamWbPy/image/large"
+                alt="Screenshot image of 25+5 Clock project"
+                loading="lazy"
+              />
+
+              <h2>25+5 Clock</h2>
+            </a>
+          </div>
+          <div className="project-tile">
+            <a href="https://codepen.io/adelinked/pen/JjrwrOb" target="_blank">
+              <img
+                src="https://codepen.io/adelinked/pen/JjrwrOb/image/large.png"
+                alt="Screenshot image Technical documentation project"
+                loading="lazy"
+              />
+
+              <h2>Technical Documentation</h2>
+            </a>
+          </div>
+          <div className="project-tile">
+            <a href="https://codepen.io/adelinked/pen/podRerx" target="_blank">
+              <img
+                src="https://codepen.io/adelinked/pen/podRerx/image/large.png"
+                alt="Screenshot image of JavaScript Calculator project"
+                loading="lazy"
+              />
+
+              <div className="project-title">
+                <h2>JavaScript Calculator</h2>
+              </div>
+            </a>
+          </div>
+          <div className="project-tile">
+            <a href="https://codepen.io/adelinked/pen/zYEMdQx" target="_blank">
+              <img
+                src="https://codepen.io/adelinked/pen/zYEMdQx/image/large.png"
+                alt="Screenshot image of Survey Form project"
+                loading="lazy"
+              />
+
+              <div className="project-title">
+                <h2>Survey Form</h2>
+              </div>
+            </a>
+          </div>
+          <div className="project-tile">
+            <a href="https://codepen.io/adelinked/pen/PoOzmzY" target="_blank">
+              <img
+                src="https://codepen.io/adelinked/pen/PoOzmzY/image/large.png"
+                alt="Screenshot image of Markdown Previewer project"
+                loading="lazy"
+              />
+
+              <div className="project-title">
+                <h2>Markdown Previewer</h2>
+              </div>
+            </a>
+          </div>
+        </div>
+        <a
+          id="profile-link"
+          href="https://www.freecodecamp.org/fccf13b2fc8-7cde-4bf2-a0be-72e94aca204e"
+          target="_blank"
+        >
+          Show all
+        </a>
+      </section>
+      <section id="contact">
+        <h3> Let's work together ... </h3>
+        <p> How do you take your coffee? </p>
+        <div id="contacts-div">
+          <a className="contact-link" href="#" title="Facebook" target="_blank">
+            <i className="fa fa-facebook-official"></i>
+          </a>
+          <a
+            className="contact-link"
+            href="https://github.com/Adelinked"
+            title="Git hub"
+            target="_blank"
+          >
+            <i className="fa fa-github"></i>
+          </a>
+          <a className="contact-link" href="#" title="Twitter" target="_blank">
+            <i className="fa fa-twitter"></i>
+          </a>
+          <a
+            className="contact-link"
+            href="#"
+            title="Send an email"
+            target="_blank"
+          >
+            <i className="fa fa-envelope"></i>
+          </a>
+          <a className="contact-link" href="#" title="Call me" target="_blank">
+            <i className="fa fa-phone"></i>
+          </a>
+        </div>
+      </section>
+      <footer id="footer">
+        <p> **This portfolio page is under construction. </p>
+        <p id="copyright">
+          {" "}
+          <sup>©</sup> Created as part of a{" "}
+          <a href="https://www.freecodecamp.org/learn" target="_blank">
+            freeCodeCamp
+          </a>{" "}
+          project.{" "}
+        </p>
+      </footer>
     </>
   );
 };
