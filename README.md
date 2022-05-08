@@ -4,7 +4,7 @@ This project contains the source code of a dark mode app using the react useCont
 
 Here are some screenshots of the application:
 ![App Screenshot](https://i.postimg.cc/NfSXZ9FY/Screenshot-1.png)
-![App Screenshot](https://i.postimg.cc/Ss7Q97hH/Screenshot-2.png)
+![App Screenshot](https://i.postimg.cc/DzwB9RyV/Screenshot-2.png)
 
 ## Built With
 
