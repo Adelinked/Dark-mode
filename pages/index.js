@@ -45,7 +45,7 @@ const Index = () => {
             Adelinked{" "}
             <span
               id="theme-switch"
-              title={`switch to ${titleTheme}`}
+              title={`Switch to ${titleTheme}`}
               onClick={switchTheme}
             >
               {theme === "light-theme" ? (
