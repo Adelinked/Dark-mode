@@ -1,10 +1,10 @@
 # Quiz application developed with Next.js React framework
 
-This project contains the source code of a quiz app using the react useState hook.
+This project contains the source code of a dark mode app using the react useContext hook and useLocalStorageValue from "@mantine/hooks".
 
 Here are some screenshots of the application:
-![App Screenshot](https://i.postimg.cc/PrByRTnD/Screenshot-2.png)
-![App Screenshot](https://i.postimg.cc/tRYBYKvw/Screenshot-2.png)
+![App Screenshot](https://i.postimg.cc/NfSXZ9FY/Screenshot-1.png)
+![App Screenshot]()
 
 ## Built With
 
