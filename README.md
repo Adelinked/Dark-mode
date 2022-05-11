@@ -3,10 +3,7 @@
 This project contains the source code of a dark mode app using the react useContext hook and useLocalStorageValue from "@mantine/hooks".
 
 Here are some screenshots of the application:
-Dark mode:
 ![App Screenshot](https://i.postimg.cc/NfSXZ9FY/Screenshot-1.png)
-
-Light mode:
 ![App Screenshot](https://i.postimg.cc/DzwB9RyV/Screenshot-2.png)
 
 ## Built With
